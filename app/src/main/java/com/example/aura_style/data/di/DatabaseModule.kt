@@ -1,11 +1,16 @@
 package com.example.aura_style.data.di
 
 import android.content.Context
+import androidx.room.Room
 import com.example.aura_style.data.local.AppDatabase
 import com.example.aura_style.data.local.dao.OutfitLogDao
 import com.example.aura_style.data.local.dao.PreferencesDao
 import com.example.aura_style.data.local.dao.UserDao
 import com.example.aura_style.data.local.dao.WardrobeDao
+import com.example.aura_style.data.repository.OutfitLogRepository
+import com.example.aura_style.data.repository.PreferencesRepository
+import com.example.aura_style.data.repository.UserRepository
+import com.example.aura_style.data.repository.WardrobeRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +24,13 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
-        AppDatabase.getDatabase(context)
+        Room.databaseBuilder(
+            context.applicationContext,
+            AppDatabase::class.java,
+            "aura_style_db"
+        )
+            .fallbackToDestructiveMigration()
+            .build()
 
     @Provides
     fun provideUserDao(appDatabase: AppDatabase): UserDao = appDatabase.userDao()
@@ -32,5 +43,23 @@ object DatabaseModule {
 
     @Provides
     fun provideOutfitLogDao(appDatabase: AppDatabase): OutfitLogDao = appDatabase.outfitLogDao()
-}
 
+    @Provides
+    @Singleton
+    fun provideUserRepository(userDao: UserDao): UserRepository = UserRepository(userDao)
+
+    @Provides
+    @Singleton
+    fun provideWardrobeRepository(wardrobeDao: WardrobeDao): WardrobeRepository =
+        WardrobeRepository(wardrobeDao)
+
+    @Provides
+    @Singleton
+    fun providePreferencesRepository(preferencesDao: PreferencesDao): PreferencesRepository =
+        PreferencesRepository(preferencesDao)
+
+    @Provides
+    @Singleton
+    fun provideOutfitLogRepository(outfitLogDao: OutfitLogDao): OutfitLogRepository =
+        OutfitLogRepository(outfitLogDao)
+}

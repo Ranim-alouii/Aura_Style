@@ -2,9 +2,8 @@ package com.example.aura_style.data.repository
 
 import com.example.aura_style.data.local.dao.WardrobeDao
 import com.example.aura_style.data.local.entity.WardrobeItem
-import javax.inject.Inject
 
-class WardrobeRepository @Inject constructor(
+class WardrobeRepository(
     private val wardrobeDao: WardrobeDao
 ) {
     suspend fun insertItem(item: WardrobeItem) = wardrobeDao.insertItem(item)
@@ -18,6 +17,3 @@ class WardrobeRepository @Inject constructor(
     suspend fun getItemsByCategory(category: String): List<WardrobeItem> =
         wardrobeDao.getItemsByCategory(category)
 }
-
-
-

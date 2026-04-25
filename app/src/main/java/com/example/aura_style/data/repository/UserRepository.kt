@@ -2,9 +2,8 @@ package com.example.aura_style.data.repository
 
 import com.example.aura_style.data.local.dao.UserDao
 import com.example.aura_style.data.local.entity.User
-import javax.inject.Inject
 
-class UserRepository @Inject constructor(
+class UserRepository(
     private val userDao: UserDao
 ) {
     suspend fun insertUser(user: User) = userDao.insertUser(user)
@@ -13,6 +12,3 @@ class UserRepository @Inject constructor(
 
     suspend fun deleteUser(user: User) = userDao.deleteUser(user)
 }
-
-
-

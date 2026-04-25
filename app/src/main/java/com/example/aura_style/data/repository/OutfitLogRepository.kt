@@ -2,9 +2,8 @@ package com.example.aura_style.data.repository
 
 import com.example.aura_style.data.local.dao.OutfitLogDao
 import com.example.aura_style.data.local.entity.OutfitLog
-import javax.inject.Inject
 
-class OutfitLogRepository @Inject constructor(
+class OutfitLogRepository(
     private val outfitLogDao: OutfitLogDao
 ) {
     suspend fun insertLog(log: OutfitLog) = outfitLogDao.insertLog(log)
@@ -13,4 +12,3 @@ class OutfitLogRepository @Inject constructor(
 
     suspend fun getLogsByDate(date: String): List<OutfitLog> = outfitLogDao.getLogsByDate(date)
 }
-
