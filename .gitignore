@@ -1,15 +1,27 @@
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+
+# Gradle/Kotlin build output
+.gradle/
+.kotlin/
+build/
+**/build/
+
+# Android Studio / IntelliJ
+.idea/
+
+# Native build intermediates
+.externalNativeBuild/
+.cxx/
+
+# Local machine config
 local.properties
+
+# Android screenshots/captures
+captures/
+
+# One-off UI dump artifacts
+aura_ui.xml
+
+# OS files
+.DS_Store
+
