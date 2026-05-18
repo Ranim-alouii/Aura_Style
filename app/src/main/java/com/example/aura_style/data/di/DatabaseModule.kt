@@ -3,6 +3,7 @@ package com.example.aura_style.data.di
 import android.content.Context
 import androidx.room.Room
 import com.example.aura_style.data.local.AppDatabase
+import com.example.aura_style.data.local.DatabaseMigrations
 import com.example.aura_style.data.local.dao.OutfitLogDao
 import com.example.aura_style.data.local.dao.PreferencesDao
 import com.example.aura_style.data.local.dao.UserDao
@@ -29,7 +30,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             "aura_style_db"
         )
-            .fallbackToDestructiveMigration()
+            .addMigrations(DatabaseMigrations.MIGRATION_2_3)
             .build()
 
     @Provides

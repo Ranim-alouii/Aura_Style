@@ -41,25 +41,19 @@ private val PurpleAccent = Color(0xFF7E57C2)
 fun LoginScreen(
     userViewModel: UserViewModel,
     onSignUpClick: () -> Unit,
+    onLoginSuccess: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var signInAttempted by remember { mutableStateOf(false) }
-    var loginMessage by remember { mutableStateOf("") }
+     var email by remember { mutableStateOf("") }
+     var password by remember { mutableStateOf("") }
 
-    val currentUser by userViewModel.user.collectAsState()
+     val authMessage by userViewModel.authMessage.collectAsState()
 
-    LaunchedEffect(currentUser, signInAttempted) {
-        if (!signInAttempted) return@LaunchedEffect
-
-        loginMessage = when {
-            currentUser == null -> "User not found"
-            currentUser?.password == password -> "Sign in successful"
-            else -> "Invalid password"
-        }
-        signInAttempted = false
-    }
+     LaunchedEffect(authMessage) {
+         if (authMessage.contains("Login successful", ignoreCase = true)) {
+             onLoginSuccess()
+         }
+     }
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -123,10 +117,9 @@ fun LoginScreen(
             Button(
                 onClick = {
                     if (email.isBlank() || password.isBlank()) {
-                        loginMessage = "Email and password are required"
+                        // Show error - but this is handled by the ViewModel now
                     } else {
-                        signInAttempted = true
-                        userViewModel.getUserByEmail(email)
+                        userViewModel.getUserByEmail(email, password)
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
@@ -158,11 +151,11 @@ fun LoginScreen(
                 )
             }
 
-            if (loginMessage.isNotBlank()) {
+            if (authMessage.isNotBlank()) {
                 Text(
-                    text = loginMessage,
+                    text = authMessage,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (loginMessage.contains("successful")) Color(0xFF2E7D32) else Color(0xFFC62828),
+                    color = if (authMessage.contains("successful", ignoreCase = true)) Color(0xFF2E7D32) else Color(0xFFC62828),
                     modifier = Modifier.padding(top = 16.dp)
                 )
             }

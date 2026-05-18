@@ -10,7 +10,10 @@ import com.example.aura_style.data.local.StringListConverter
 data class Preferences(
     @field:PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val style: String,
-    val favoriteColors: List<String>
+    val style: String = "Casual",
+    val favoriteColors: List<String> = listOf(),
+    val weatherSensitive: Boolean = true,
+    val notificationsEnabled: Boolean = true,
+    val privacySettingsEnabled: Boolean = false
 )
 

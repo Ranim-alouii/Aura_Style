@@ -25,6 +25,24 @@ class WardrobeViewModel @Inject constructor(
         }
     }
 
+    fun insertItem(
+        name: String,
+        category: String,
+        selectedStyle: String,
+        selectedColor: String,
+        photoUri: String? = null
+    ) {
+        insertItem(
+            WardrobeItem(
+                name = name.trim(),
+                category = category.trim(),
+                color = selectedColor,
+                season = selectedStyle,
+                photoUri = photoUri
+            )
+        )
+    }
+
     fun updateItem(item: WardrobeItem) {
         viewModelScope.launch {
             wardrobeRepository.updateItem(item)

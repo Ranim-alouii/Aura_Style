@@ -10,6 +10,7 @@ data class WardrobeItem(
     val name: String,
     val category: String,
     val color: String,
-    val season: String
+    val season: String,
+    val photoUri: String? = null
 )
 

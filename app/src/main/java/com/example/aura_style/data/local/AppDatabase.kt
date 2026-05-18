@@ -14,7 +14,7 @@ import com.example.aura_style.data.local.entity.WardrobeItem
 
 @Database(
     entities = [User::class, WardrobeItem::class, Preferences::class, OutfitLog::class],
-    version = 1,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(StringListConverter::class)
