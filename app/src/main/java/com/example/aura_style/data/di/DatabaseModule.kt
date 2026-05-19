@@ -4,10 +4,12 @@ import android.content.Context
 import androidx.room.Room
 import com.example.aura_style.data.local.AppDatabase
 import com.example.aura_style.data.local.DatabaseMigrations
+import com.example.aura_style.data.local.dao.FavoriteDao
 import com.example.aura_style.data.local.dao.OutfitLogDao
 import com.example.aura_style.data.local.dao.PreferencesDao
 import com.example.aura_style.data.local.dao.UserDao
 import com.example.aura_style.data.local.dao.WardrobeDao
+import com.example.aura_style.data.repository.FavoriteRepository
 import com.example.aura_style.data.repository.OutfitLogRepository
 import com.example.aura_style.data.repository.PreferencesRepository
 import com.example.aura_style.data.repository.UserRepository
@@ -31,6 +33,8 @@ object DatabaseModule {
             "aura_style_db"
         )
             .addMigrations(DatabaseMigrations.MIGRATION_2_3)
+            .addMigrations(DatabaseMigrations.MIGRATION_3_4)
+            .fallbackToDestructiveMigration(false)
             .build()
 
     @Provides
@@ -44,6 +48,9 @@ object DatabaseModule {
 
     @Provides
     fun provideOutfitLogDao(appDatabase: AppDatabase): OutfitLogDao = appDatabase.outfitLogDao()
+
+    @Provides
+    fun provideFavoriteDao(appDatabase: AppDatabase): FavoriteDao = appDatabase.favoriteDao()
 
     @Provides
     @Singleton
@@ -63,4 +70,9 @@ object DatabaseModule {
     @Singleton
     fun provideOutfitLogRepository(outfitLogDao: OutfitLogDao): OutfitLogRepository =
         OutfitLogRepository(outfitLogDao)
+
+    @Provides
+    @Singleton
+    fun provideFavoriteRepository(favoriteDao: FavoriteDao): FavoriteRepository =
+        FavoriteRepository(favoriteDao)
 }

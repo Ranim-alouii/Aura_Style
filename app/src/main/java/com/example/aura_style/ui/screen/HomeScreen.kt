@@ -266,30 +266,30 @@ fun HomeScreen(
                     onClick = { selectedNavIndex = 0 }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Add, contentDescription = "Add") },
-                    label = { Text("Add") },
+                    icon = { Icon(Icons.Filled.Search, contentDescription = "Wardrobe") },
+                    label = { Text("Wardrobe") },
                     selected = selectedNavIndex == 1,
                     onClick = {
                         selectedNavIndex = 1
+                        onNavigateToSearch()
+                    }
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Filled.Add, contentDescription = "Add") },
+                    label = { Text("Add") },
+                    selected = selectedNavIndex == 2,
+                    onClick = {
+                        selectedNavIndex = 2
                         onNavigateToAdd()
                     }
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.Favorite, contentDescription = "Favorites") },
                     label = { Text("Favorites") },
-                    selected = selectedNavIndex == 2,
-                    onClick = {
-                        selectedNavIndex = 2
-                        onNavigateToFavorites()
-                    }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Search, contentDescription = "Search") },
-                    label = { Text("Search") },
                     selected = selectedNavIndex == 3,
                     onClick = {
                         selectedNavIndex = 3
-                        onNavigateToSearch()
+                        onNavigateToFavorites()
                     }
                 )
                 NavigationBarItem(

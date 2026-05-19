@@ -16,10 +16,13 @@ import androidx.compose.ui.Modifier
 import com.example.aura_style.ui.screen.AddItemScreen
 import com.example.aura_style.ui.screen.HomeScreen
 import com.example.aura_style.ui.screen.LoginScreen
+import com.example.aura_style.ui.screen.FavoritesScreen
 import com.example.aura_style.ui.screen.PreferencesScreen
 import com.example.aura_style.ui.screen.RegistrationScreen
+import com.example.aura_style.ui.screen.WardrobeScreen
 import com.example.aura_style.ui.theme.Aura_StyleTheme
 import com.example.aura_style.ui.viewmodel.OutfitRecommendationViewModel
+import com.example.aura_style.ui.viewmodel.FavoritesViewModel
 import com.example.aura_style.ui.viewmodel.PreferencesViewModel
 import com.example.aura_style.ui.viewmodel.UserViewModel
 import com.example.aura_style.ui.viewmodel.WardrobeViewModel
@@ -31,6 +34,7 @@ class MainActivity : ComponentActivity() {
     private val outfitRecommendationViewModel: OutfitRecommendationViewModel by viewModels()
     private val preferencesViewModel: PreferencesViewModel by viewModels()
     private val wardrobeViewModel: WardrobeViewModel by viewModels()
+    private val favoritesViewModel: FavoritesViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,28 +42,40 @@ class MainActivity : ComponentActivity() {
         setContent {
             var showRegistration by rememberSaveable { mutableStateOf(false) }
             var isLoggedIn by rememberSaveable { mutableStateOf(false) }
-            var currentScreen by rememberSaveable { mutableStateOf("home") } // home, preferences, add, favorites, search
+            var currentScreen by rememberSaveable { mutableStateOf("home") } // home, wardrobe, preferences, add, favorites
 
             Aura_StyleTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    when {
-                        !isLoggedIn && !showRegistration -> {
+                    if (!isLoggedIn) {
+                        if (!showRegistration) {
                             LoginScreen(
                                 userViewModel = userViewModel,
                                 onSignUpClick = { showRegistration = true },
-                                onLoginSuccess = { isLoggedIn = true },
+                                onLoginSuccess = {
+                                    isLoggedIn = true
+                                    currentScreen = "home"
+                                },
                                 modifier = Modifier.padding(innerPadding)
                             )
-                        }
-                        !isLoggedIn && showRegistration -> {
+                        } else {
                             RegistrationScreen(
                                 userViewModel = userViewModel,
                                 onBackToLoginClick = { showRegistration = false },
                                 modifier = Modifier.padding(innerPadding)
                             )
                         }
-                        isLoggedIn && currentScreen == "preferences" -> {
-                            PreferencesScreen(
+                    } else {
+                        when (currentScreen) {
+                            "favorites" -> FavoritesScreen(
+                                favoritesViewModel = favoritesViewModel,
+                                onNavigateToHome = { currentScreen = "home" },
+                                onNavigateToWardrobe = { currentScreen = "wardrobe" },
+                                onNavigateToAdd = { currentScreen = "add" },
+                                onNavigateToFavorites = { currentScreen = "favorites" },
+                                onNavigateToProfile = { currentScreen = "preferences" },
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                            "preferences" -> PreferencesScreen(
                                 preferencesViewModel = preferencesViewModel,
                                 userViewModel = userViewModel,
                                 onNavigateToHome = { currentScreen = "home" },
@@ -68,9 +84,7 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToFavorites = { currentScreen = "favorites" },
                                 modifier = Modifier.padding(innerPadding)
                             )
-                        }
-                        isLoggedIn && currentScreen == "add" -> {
-                            AddItemScreen(
+                            "add" -> AddItemScreen(
                                 wardrobeViewModel = wardrobeViewModel,
                                 userViewModel = userViewModel,
                                 onNavigateToHome = { currentScreen = "home" },
@@ -79,13 +93,20 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToProfile = { currentScreen = "preferences" },
                                 modifier = Modifier.padding(innerPadding)
                             )
-                        }
-                        else -> {
-                            HomeScreen(
+                            "wardrobe" -> WardrobeScreen(
+                                wardrobeViewModel = wardrobeViewModel,
+                                onNavigateToHome = { currentScreen = "home" },
+                                onNavigateToWardrobe = { currentScreen = "wardrobe" },
+                                onNavigateToAdd = { currentScreen = "add" },
+                                onNavigateToFavorites = { currentScreen = "favorites" },
+                                onNavigateToProfile = { currentScreen = "preferences" },
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                            else -> HomeScreen(
                                 outfitRecommendationViewModel = outfitRecommendationViewModel,
                                 onNavigateToAdd = { currentScreen = "add" },
                                 onNavigateToFavorites = { currentScreen = "favorites" },
-                                onNavigateToSearch = { currentScreen = "search" },
+                                onNavigateToSearch = { currentScreen = "wardrobe" },
                                 onNavigateToProfile = { currentScreen = "preferences" },
                                 modifier = Modifier.padding(innerPadding)
                             )
