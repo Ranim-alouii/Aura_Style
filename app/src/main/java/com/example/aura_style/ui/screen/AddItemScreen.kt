@@ -65,6 +65,7 @@ private val PurpleAccent = Color(0xFF7E57C2)
 private val LightPurple = Color(0xFFF3E5F5)
 
 private val StyleOptions = listOf("Casual", "Elegant", "Streetwear", "Sporty")
+private val CategoryOptions = listOf("Top", "Bottom", "Shoes", "Accessories", "Outerwear")
 private val ColorPalette = listOf(
     "Purple" to Color(0xFF7E57C2),
     "Blue" to Color(0xFF2196F3),
@@ -175,17 +176,34 @@ fun AddItemScreen(
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
                 )
 
-                OutlinedTextField(
-                    value = category,
-                    onValueChange = { category = it },
-                    label = { Text("Category") },
+                Text(
+                    text = "Category",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color(0xFF212121),
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 12.dp)
+                )
+
+                LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 12.dp),
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
-                )
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(CategoryOptions) { cat ->
+                        FilterChip(
+                            selected = category == cat,
+                            onClick = { category = cat },
+                            label = { Text(cat) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = PurpleAccent,
+                                selectedLabelColor = Color.White,
+                                containerColor = Color(0xFFE8E8E8),
+                                labelColor = Color(0xFF212121)
+                            )
+                        )
+                    }
+                }
 
                 Button(
                     onClick = { photoPickerLauncher.launch(arrayOf("image/*")) },

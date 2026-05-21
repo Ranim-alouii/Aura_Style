@@ -1,5 +1,9 @@
 package com.example.aura_style.ui.screen
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,16 +39,19 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.example.aura_style.ui.viewmodel.OutfitRecommendationViewModel
 
 private val PurpleAccent = Color(0xFF7E57C2)
@@ -53,18 +60,44 @@ private val LightPurple = Color(0xFFF3E5F5)
 @Composable
 fun HomeScreen(
     outfitRecommendationViewModel: OutfitRecommendationViewModel,
+    modifier: Modifier = Modifier,
     onNavigateToAdd: () -> Unit = {},
     onNavigateToFavorites: () -> Unit = {},
     onNavigateToSearch: () -> Unit = {},
-    onNavigateToProfile: () -> Unit = {},
-    modifier: Modifier = Modifier
+    onNavigateToProfile: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     var selectedNavIndex by remember { mutableIntStateOf(0) }
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            outfitRecommendationViewModel.getWeatherData()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        val hasLocationPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasLocationPermission) {
+            outfitRecommendationViewModel.getWeatherData()
+        } else {
+            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
     
     val weather by outfitRecommendationViewModel.weather.collectAsState()
     val selectedOccasion by outfitRecommendationViewModel.selectedOccasion.collectAsState()
     val recommendedOutfit by outfitRecommendationViewModel.recommendedOutfit.collectAsState()
     val loading by outfitRecommendationViewModel.loading.collectAsState()
+    val errorMessage by outfitRecommendationViewModel.errorMessage.collectAsState()
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -237,6 +270,24 @@ fun HomeScreen(
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                // Error message display
+                errorMessage?.let { error ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                        color = Color(0xFFFFEBEE),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = error,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFFC62828),
+                            modifier = Modifier.padding(12.dp)
+                        )
+                    }
+                }
 
                 // Generate New button
                 Button(
