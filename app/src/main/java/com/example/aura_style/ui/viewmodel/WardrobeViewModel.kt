@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 private const val TAG = "WardrobeViewModel"
 
 @HiltViewModel
-class WardrobeViewModel @Inject constructor(
+open class WardrobeViewModel @Inject constructor(
     private val wardrobeRepository: WardrobeRepository
 ) : ViewModel() {
     private val sampleItems = listOf(
@@ -160,4 +160,3 @@ class WardrobeViewModel @Inject constructor(
         }
     }
 }
-

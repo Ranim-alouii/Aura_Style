@@ -3,17 +3,13 @@ package com.example.aura_style.data.repository
 import com.example.aura_style.data.local.dao.WardrobeDao
 import com.example.aura_style.data.local.entity.WardrobeItem
 
-class WardrobeRepository(
+open class WardrobeRepository(
     private val wardrobeDao: WardrobeDao
 ) {
-    suspend fun insertItem(item: WardrobeItem) = wardrobeDao.insertItem(item)
-
-    suspend fun updateItem(item: WardrobeItem) = wardrobeDao.updateItem(item)
-
-    suspend fun deleteItem(item: WardrobeItem) = wardrobeDao.deleteItem(item)
-
-    suspend fun getAllItems(): List<WardrobeItem> = wardrobeDao.getAllItems()
-
-    suspend fun getItemsByCategory(category: String): List<WardrobeItem> =
+    open suspend fun insertItem(item: WardrobeItem) = wardrobeDao.insertItem(item)
+    open suspend fun updateItem(item: WardrobeItem) = wardrobeDao.updateItem(item)
+    open suspend fun deleteItem(item: WardrobeItem) = wardrobeDao.deleteItem(item)
+    open suspend fun getAllItems(): List<WardrobeItem> = wardrobeDao.getAllItems()
+    open suspend fun getItemsByCategory(category: String): List<WardrobeItem> =
         wardrobeDao.getItemsByCategory(category)
 }

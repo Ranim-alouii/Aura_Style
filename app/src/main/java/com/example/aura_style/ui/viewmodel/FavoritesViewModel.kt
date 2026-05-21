@@ -12,34 +12,34 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class FavoritesViewModel @Inject constructor(
+open class FavoritesViewModel @Inject constructor(
     private val favoriteRepository: FavoriteRepository
 ) : ViewModel() {
-    private val _favorites = MutableStateFlow<List<Favorite>>(emptyList())
-    val favorites: StateFlow<List<Favorite>> = _favorites.asStateFlow()
+    protected val _favorites = MutableStateFlow<List<Favorite>>(emptyList())
+    open val favorites: StateFlow<List<Favorite>> = _favorites.asStateFlow()
 
-    private val _favoritesCount = MutableStateFlow(0)
-    val favoritesCount: StateFlow<Int> = _favoritesCount.asStateFlow()
+    protected val _favoritesCount = MutableStateFlow(0)
+    open val favoritesCount: StateFlow<Int> = _favoritesCount.asStateFlow()
 
     init {
         getAllFavorites()
     }
 
-    fun getAllFavorites() {
+    protected open fun getAllFavorites() {
         viewModelScope.launch {
             _favorites.value = favoriteRepository.getAllFavorites()
             _favoritesCount.value = favoriteRepository.getFavoritesCount()
         }
     }
 
-    fun deleteFavorite(favorite: Favorite) {
+    open fun deleteFavorite(favorite: Favorite) {
         viewModelScope.launch {
             favoriteRepository.deleteFavorite(favorite)
             getAllFavorites()
         }
     }
 
-    fun toggleFavorite(favorite: Favorite) {
+    open fun toggleFavorite(favorite: Favorite) {
         val updated = favorite.copy(isFavorited = !favorite.isFavorited)
         viewModelScope.launch {
             favoriteRepository.updateFavorite(updated)
@@ -47,11 +47,10 @@ class FavoritesViewModel @Inject constructor(
         }
     }
 
-    fun insertFavorite(favorite: Favorite) {
+    open fun insertFavorite(favorite: Favorite) {
         viewModelScope.launch {
             favoriteRepository.insertFavorite(favorite)
             getAllFavorites()
         }
     }
 }
-
