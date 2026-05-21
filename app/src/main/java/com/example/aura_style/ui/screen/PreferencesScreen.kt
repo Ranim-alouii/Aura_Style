@@ -3,16 +3,7 @@ package com.example.aura_style.ui.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -20,41 +11,21 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.aura_style.ui.viewmodel.FavoritesViewModel
 import com.example.aura_style.ui.viewmodel.PreferencesViewModel
 import com.example.aura_style.ui.viewmodel.UserViewModel
+import com.example.aura_style.ui.viewmodel.WardrobeViewModel
 
-private val PurpleAccent = Color(0xFF7E57C2)
-private val LightPurple = Color(0xFFF3E5F5)
-
-// Color palette for favorite colors section
+// Representational colors for the palette picker
 private val ColorPalette = listOf(
     Color(0xFF7E57C2),  // Purple
     Color(0xFF2196F3),  // Blue
@@ -70,6 +41,8 @@ private val ColorNames = listOf("Purple", "Blue", "Green", "Yellow", "Orange", "
 fun PreferencesScreen(
     preferencesViewModel: PreferencesViewModel,
     userViewModel: UserViewModel,
+    wardrobeViewModel: WardrobeViewModel,
+    favoritesViewModel: FavoritesViewModel,
     onNavigateToHome: () -> Unit = {},
     onNavigateToWardrobe: () -> Unit = {},
     onNavigateToAdd: () -> Unit = {},
@@ -80,15 +53,16 @@ fun PreferencesScreen(
     
     val preferences by preferencesViewModel.preferences.collectAsState()
     val currentUser by userViewModel.user.collectAsState()
+    val wardrobeItems by wardrobeViewModel.items.collectAsState()
+    val favoritesCount by favoritesViewModel.favoritesCount.collectAsState()
 
     Surface(
         modifier = modifier.fillMaxSize(),
-        color = Color.White
+        color = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Main content area with scroll
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -96,11 +70,10 @@ fun PreferencesScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp, vertical = 20.dp)
             ) {
-                // Profile Header
                 Text(
                     text = "My Profile",
                     style = MaterialTheme.typography.headlineSmall,
-                    color = Color(0xFF212121),
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -109,8 +82,9 @@ fun PreferencesScreen(
                 // Profile Info Card
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    color = LightPurple,
-                    shape = RoundedCornerShape(16.dp)
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = RoundedCornerShape(16.dp),
+                    tonalElevation = 2.dp
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp)
@@ -118,13 +92,13 @@ fun PreferencesScreen(
                         Box(
                             modifier = Modifier
                                 .size(60.dp)
-                                .background(PurpleAccent, CircleShape),
+                                .background(MaterialTheme.colorScheme.primary, CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = (currentUser?.email?.firstOrNull()?.uppercase() ?: "U"),
                                 style = MaterialTheme.typography.headlineSmall,
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -134,14 +108,14 @@ fun PreferencesScreen(
                         Text(
                             text = currentUser?.email?.substringBefore("@") ?: "User",
                             style = MaterialTheme.typography.titleMedium,
-                            color = Color(0xFF212121),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontWeight = FontWeight.SemiBold
                         )
 
                         Text(
                             text = currentUser?.email ?: "user@example.com",
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFF616161),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
                             modifier = Modifier.padding(top = 4.dp)
                         )
                     }
@@ -149,25 +123,24 @@ fun PreferencesScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Stats Row
+                // Stats Row - Pulling real counts from DB
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    StatCard("24", "Outfits")
-                    StatCard("89", "Items")
-                    StatCard("12", "Favorites")
+                    StatCard("0", "Outfits")
+                    StatCard(wardrobeItems.size.toString(), "Items")
+                    StatCard(favoritesCount.toString(), "Favorites")
                 }
 
                 Spacer(modifier = Modifier.height(28.dp))
 
-                // Style Preference Section
                 Text(
                     text = "Style Preference",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color(0xFF212121),
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.SemiBold
                 )
 
@@ -183,10 +156,10 @@ fun PreferencesScreen(
                             onClick = { preferencesViewModel.updateStyle(style) },
                             label = { Text(style) },
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = PurpleAccent,
-                                selectedLabelColor = Color.White,
-                                containerColor = Color(0xFFE8E8E8),
-                                labelColor = Color(0xFF212121)
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                labelColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -194,18 +167,17 @@ fun PreferencesScreen(
 
                 Spacer(modifier = Modifier.height(28.dp))
 
-                // Favorite Colors Section
                 Text(
                     text = "Favorite Colors",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color(0xFF212121),
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.SemiBold
                 )
 
                 Text(
                     text = "Select your preferred color palette",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF616161),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp)
                 )
 
@@ -237,17 +209,24 @@ fun PreferencesScreen(
 
                 Spacer(modifier = Modifier.height(28.dp))
 
-                // Settings Section
                 Text(
                     text = "Settings",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color(0xFF212121),
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.SemiBold
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Weather Sensitive Toggle
+                SettingRow(
+                    title = "Dark Mode",
+                    description = "Switch between light and dark themes",
+                    isEnabled = preferences?.isDarkMode ?: false,
+                    onToggle = { preferencesViewModel.toggleDarkMode() }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 SettingRow(
                     title = "Weather Sensitive",
                     description = "AI considers weather in recommendations",
@@ -257,7 +236,6 @@ fun PreferencesScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Notifications Toggle
                 SettingRow(
                     title = "Notifications",
                     description = "Daily outfit suggestions",
@@ -267,7 +245,6 @@ fun PreferencesScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Privacy Settings
                 SettingRowWithArrow(
                     title = "Privacy Settings",
                     description = "Control your data and privacy",
@@ -278,10 +255,9 @@ fun PreferencesScreen(
                 Spacer(modifier = Modifier.height(20.dp))
             }
 
-            // Bottom Navigation Bar
             NavigationBar(
                 modifier = Modifier.fillMaxWidth(),
-                containerColor = Color.White,
+                containerColor = MaterialTheme.colorScheme.surface,
                 tonalElevation = 8.dp
             ) {
                 NavigationBarItem(
@@ -339,9 +315,10 @@ private fun StatCard(
     Surface(
         modifier = Modifier
             .padding(4.dp)
-            .border(1.dp, PurpleAccent, RoundedCornerShape(12.dp)),
-        color = Color.White,
-        shape = RoundedCornerShape(12.dp)
+            .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)),
+        color = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(12.dp),
+        tonalElevation = 1.dp
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
@@ -350,13 +327,13 @@ private fun StatCard(
             Text(
                 text = value,
                 style = MaterialTheme.typography.titleMedium,
-                color = PurpleAccent,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
-                color = Color(0xFF616161),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp)
             )
         }
@@ -376,7 +353,7 @@ private fun ColorPickerCircle(
             .background(color, CircleShape)
             .border(
                 width = if (isSelected) 3.dp else 2.dp,
-                color = if (isSelected) PurpleAccent else Color.LightGray,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                 shape = CircleShape
             )
             .clickable { onColorSelected(!isSelected) },
@@ -384,7 +361,7 @@ private fun ColorPickerCircle(
     ) {
         if (isSelected) {
             Icon(
-                imageVector = Icons.Filled.Favorite,
+                imageVector = Icons.Filled.Check,
                 contentDescription = colorName,
                 tint = Color.White,
                 modifier = Modifier.size(24.dp)
@@ -403,7 +380,10 @@ private fun SettingRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(LightPurple, RoundedCornerShape(12.dp))
+            .background(
+                MaterialTheme.colorScheme.secondaryContainer,
+                RoundedCornerShape(12.dp)
+            )
             .padding(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -414,13 +394,13 @@ private fun SettingRow(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
-                color = Color(0xFF212121),
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = Color(0xFF616161),
+                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
                 modifier = Modifier.padding(top = 2.dp)
             )
         }
@@ -428,10 +408,10 @@ private fun SettingRow(
             checked = isEnabled,
             onCheckedChange = { onToggle() },
             colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.White,
-                checkedTrackColor = PurpleAccent,
-                uncheckedThumbColor = Color.White,
-                uncheckedTrackColor = Color(0xFFCCC2D9)
+                checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                checkedTrackColor = MaterialTheme.colorScheme.primary,
+                uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+                uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
             )
         )
     }
@@ -447,7 +427,10 @@ private fun SettingRowWithArrow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(LightPurple, RoundedCornerShape(12.dp))
+            .background(
+                MaterialTheme.colorScheme.secondaryContainer,
+                RoundedCornerShape(12.dp)
+            )
             .clickable { onToggle() }
             .padding(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -459,13 +442,13 @@ private fun SettingRowWithArrow(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
-                color = Color(0xFF212121),
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = Color(0xFF616161),
+                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
                 modifier = Modifier.padding(top = 2.dp)
             )
         }
@@ -476,16 +459,16 @@ private fun SettingRowWithArrow(
                 checked = isEnabled,
                 onCheckedChange = { onToggle() },
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = Color.White,
-                    checkedTrackColor = PurpleAccent,
-                    uncheckedThumbColor = Color.White,
-                    uncheckedTrackColor = Color(0xFFCCC2D9)
+                    checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                    checkedTrackColor = MaterialTheme.colorScheme.primary,
+                    uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+                    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             )
             Icon(
                 Icons.Filled.ArrowForward,
                 contentDescription = "More options",
-                tint = PurpleAccent,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .size(20.dp)
                     .padding(start = 4.dp)
@@ -493,4 +476,3 @@ private fun SettingRowWithArrow(
         }
     }
 }
-

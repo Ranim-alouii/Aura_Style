@@ -5,61 +5,34 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import com.example.aura_style.data.local.entity.Favorite
+import com.example.aura_style.ui.viewmodel.FavoritesViewModel
 import com.example.aura_style.ui.viewmodel.OutfitRecommendationViewModel
-
-private val PurpleAccent = Color(0xFF7E57C2)
-private val LightPurple = Color(0xFFF3E5F5)
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun HomeScreen(
     outfitRecommendationViewModel: OutfitRecommendationViewModel,
+    favoritesViewModel: FavoritesViewModel,
     modifier: Modifier = Modifier,
     onNavigateToAdd: () -> Unit = {},
     onNavigateToFavorites: () -> Unit = {},
@@ -98,15 +71,16 @@ fun HomeScreen(
     val recommendedOutfit by outfitRecommendationViewModel.recommendedOutfit.collectAsState()
     val loading by outfitRecommendationViewModel.loading.collectAsState()
     val errorMessage by outfitRecommendationViewModel.errorMessage.collectAsState()
+    val favorites by favoritesViewModel.favorites.collectAsState()
 
     Surface(
         modifier = modifier.fillMaxSize(),
-        color = Color.White
+        color = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Main content area with scroll
+            // Main content area
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -118,13 +92,13 @@ fun HomeScreen(
                 Text(
                     text = "Good morning, Fashionista",
                     style = MaterialTheme.typography.headlineSmall,
-                    color = Color(0xFF212121),
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = "Let's create the perfect look for today",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF616161),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp)
                 )
 
@@ -133,8 +107,9 @@ fun HomeScreen(
                 // Weather card
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    color = LightPurple,
-                    shape = RoundedCornerShape(16.dp)
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = RoundedCornerShape(16.dp),
+                    tonalElevation = 2.dp
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp)
@@ -148,20 +123,20 @@ fun HomeScreen(
                                 Text(
                                     text = weather.temperature,
                                     style = MaterialTheme.typography.headlineSmall,
-                                    color = PurpleAccent,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = weather.condition,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = Color(0xFF616161),
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
                                     modifier = Modifier.padding(top = 4.dp)
                                 )
                             }
                             Text(
                                 text = weather.date,
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color(0xFF9575CD),
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
                                 fontWeight = FontWeight.Medium
                             )
                         }
@@ -174,7 +149,7 @@ fun HomeScreen(
                 Text(
                     text = "What's the occasion?",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color(0xFF212121),
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.SemiBold
                 )
 
@@ -190,10 +165,10 @@ fun HomeScreen(
                             onClick = { outfitRecommendationViewModel.selectOccasion(occasion) },
                             label = { Text(occasion) },
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = PurpleAccent,
-                                selectedLabelColor = Color.White,
-                                containerColor = Color(0xFFE8E8E8),
-                                labelColor = Color(0xFF212121)
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                labelColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -202,12 +177,42 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // AI Recommendation section
-                Text(
-                    text = "AI Recommendation",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color(0xFF212121),
-                    fontWeight = FontWeight.SemiBold
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "AI Recommendation",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    
+                    if (!loading && recommendedOutfit.items.isNotEmpty()) {
+                        val isAlreadyFavorite = favorites.any { it.clothingItems == recommendedOutfit.items.joinToString(", ") }
+                        IconButton(
+                            onClick = {
+                                if (!isAlreadyFavorite) {
+                                    favoritesViewModel.insertFavorite(
+                                        Favorite(
+                                            outfitName = "${selectedOccasion} Outfit",
+                                            occasion = selectedOccasion,
+                                            clothingItems = recommendedOutfit.items.joinToString(", "),
+                                            savedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                                        )
+                                    )
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = if (isAlreadyFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                contentDescription = "Favorite",
+                                tint = if (isAlreadyFavorite) Color.Red else MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
 
                 if (loading) {
                     Box(
@@ -216,15 +221,16 @@ fun HomeScreen(
                             .height(200.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = PurpleAccent)
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                     }
                 } else {
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 12.dp),
-                        color = LightPurple,
-                        shape = RoundedCornerShape(16.dp)
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = RoundedCornerShape(16.dp),
+                        tonalElevation = 2.dp
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp)
@@ -232,7 +238,7 @@ fun HomeScreen(
                             Text(
                                 text = "Recommended Outfit",
                                 style = MaterialTheme.typography.titleSmall,
-                                color = PurpleAccent,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 fontWeight = FontWeight.Bold
                             )
 
@@ -247,12 +253,12 @@ fun HomeScreen(
                                         Box(
                                             modifier = Modifier
                                                 .size(4.dp)
-                                                .background(PurpleAccent, RoundedCornerShape(2.dp))
+                                                .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(2.dp))
                                         )
                                         Text(
                                             text = item,
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = Color(0xFF212121),
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer,
                                             modifier = Modifier.padding(start = 8.dp)
                                         )
                                     }
@@ -262,7 +268,7 @@ fun HomeScreen(
                             Text(
                                 text = recommendedOutfit.description,
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color(0xFF616161),
+                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
                                 modifier = Modifier.padding(top = 12.dp)
                             )
                         }
@@ -271,43 +277,48 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Error message display
+                // Error message
                 errorMessage?.let { error ->
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 12.dp),
-                        color = Color(0xFFFFEBEE),
+                        color = MaterialTheme.colorScheme.errorContainer,
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
                             text = error,
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFFC62828),
+                            color = MaterialTheme.colorScheme.onErrorContainer,
                             modifier = Modifier.padding(12.dp)
                         )
                     }
                 }
 
-                // Generate New button
+                // Generate button
                 Button(
                     onClick = { outfitRecommendationViewModel.generateRecommendation() },
-                    colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp)
                 ) {
-                    Text("Generate New", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        text = "Generate New",
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
             }
 
-            // Bottom Navigation Bar
+            // Navigation bar
             NavigationBar(
                 modifier = Modifier.fillMaxWidth(),
-                containerColor = Color.White,
+                containerColor = MaterialTheme.colorScheme.surface,
                 tonalElevation = 8.dp
             ) {
                 NavigationBarItem(
@@ -356,4 +367,3 @@ fun HomeScreen(
         }
     }
 }
-

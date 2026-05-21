@@ -14,6 +14,6 @@ data class Preferences(
     val favoriteColors: List<String> = listOf(),
     val weatherSensitive: Boolean = true,
     val notificationsEnabled: Boolean = true,
-    val privacySettingsEnabled: Boolean = false
+    val privacySettingsEnabled: Boolean = false,
+    val isDarkMode: Boolean = false
 )
-

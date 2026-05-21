@@ -16,7 +16,7 @@ import com.example.aura_style.data.local.entity.WardrobeItem
 
 @Database(
     entities = [User::class, WardrobeItem::class, Preferences::class, OutfitLog::class, Favorite::class],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(StringListConverter::class)
@@ -27,4 +27,3 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun outfitLogDao(): OutfitLogDao
     abstract fun favoriteDao(): FavoriteDao
 }
-

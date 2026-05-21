@@ -2,31 +2,12 @@ package com.example.aura_style.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,8 +15,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.aura_style.ui.viewmodel.UserViewModel
-
-private val PurpleAccent = Color(0xFF7E57C2)
 
 @Composable
 fun LoginScreen(
@@ -57,7 +36,7 @@ fun LoginScreen(
 
     Surface(
         modifier = modifier.fillMaxSize(),
-        color = Color.White
+        color = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
@@ -68,10 +47,10 @@ fun LoginScreen(
             Icon(
                 imageVector = Icons.Filled.Person,
                 contentDescription = "Top placeholder icon",
-                tint = PurpleAccent,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .padding(top = 24.dp)
-                    .background(Color(0xFFF3E5F5), RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(16.dp))
                     .padding(16.dp)
             )
 
@@ -80,14 +59,14 @@ fun LoginScreen(
             Text(
                 text = "Welcome back",
                 style = MaterialTheme.typography.headlineMedium,
-                color = Color(0xFF212121),
+                color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
                 text = "Sign in to your wardrobe",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF616161),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 8.dp)
             )
 
@@ -116,19 +95,17 @@ fun LoginScreen(
 
             Button(
                 onClick = {
-                    if (email.isBlank() || password.isBlank()) {
-                        // Show error - but this is handled by the ViewModel now
-                    } else {
+                    if (email.isNotBlank() && password.isNotBlank()) {
                         userViewModel.getUserByEmail(email, password)
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 shape = RoundedCornerShape(14.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 18.dp)
             ) {
-                Text("Sign in")
+                Text("Sign in", color = MaterialTheme.colorScheme.onPrimary)
             }
 
             Row(
@@ -141,12 +118,12 @@ fun LoginScreen(
                 Icon(
                     imageVector = Icons.Filled.Person,
                     contentDescription = "Google icon placeholder",
-                    tint = PurpleAccent
+                    tint = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = "Continue with Google",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF424242),
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }
@@ -155,7 +132,7 @@ fun LoginScreen(
                 Text(
                     text = authMessage,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (authMessage.contains("successful", ignoreCase = true)) Color(0xFF2E7D32) else Color(0xFFC62828),
+                    color = if (authMessage.contains("successful", ignoreCase = true)) Color(0xFF2E7D32) else MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(top = 16.dp)
                 )
             }
@@ -168,12 +145,12 @@ fun LoginScreen(
             ) {
                 Text(
                     text = "Don't have an account? ",
-                    color = Color(0xFF616161),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
                     text = "Sign up",
-                    color = PurpleAccent,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.clickable { onSignUpClick() }
@@ -195,7 +172,7 @@ fun RegistrationScreen(
 
     Surface(
         modifier = modifier.fillMaxSize(),
-        color = Color.White
+        color = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
@@ -207,7 +184,7 @@ fun RegistrationScreen(
             Text(
                 text = "Create account",
                 style = MaterialTheme.typography.headlineSmall,
-                color = Color(0xFF212121),
+                color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold
             )
 
@@ -234,25 +211,25 @@ fun RegistrationScreen(
 
             Button(
                 onClick = { userViewModel.insertUser(email, password) },
-                colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp)
             ) {
-                Text("Register")
+                Text("Register", color = MaterialTheme.colorScheme.onPrimary)
             }
 
             if (authMessage.isNotBlank()) {
                 Text(
                     text = authMessage,
                     modifier = Modifier.padding(top = 12.dp),
-                    color = if (authMessage.contains("successful")) Color(0xFF2E7D32) else Color(0xFFC62828)
+                    color = if (authMessage.contains("successful")) Color(0xFF2E7D32) else MaterialTheme.colorScheme.error
                 )
             }
 
             Text(
                 text = "Back to sign in",
-                color = PurpleAccent,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
                     .padding(top = 18.dp)

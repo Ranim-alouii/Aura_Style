@@ -71,5 +71,10 @@ class PreferencesViewModel @Inject constructor(
         val updatedPrefs = currentPrefs.copy(privacySettingsEnabled = !currentPrefs.privacySettingsEnabled)
         updatePreferences(updatedPrefs)
     }
-}
 
+    fun toggleDarkMode() {
+        val currentPrefs = _preferences.value ?: Preferences()
+        val updatedPrefs = currentPrefs.copy(isDarkMode = !currentPrefs.isDarkMode)
+        updatePreferences(updatedPrefs)
+    }
+}

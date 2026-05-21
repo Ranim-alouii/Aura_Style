@@ -5,9 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -44,7 +46,10 @@ class MainActivity : ComponentActivity() {
             var isLoggedIn by rememberSaveable { mutableStateOf(false) }
             var currentScreen by rememberSaveable { mutableStateOf("home") } // home, wardrobe, preferences, add, favorites
 
-            Aura_StyleTheme {
+            val preferences by preferencesViewModel.preferences.collectAsState()
+            val isDarkMode = preferences?.isDarkMode ?: isSystemInDarkTheme()
+
+            Aura_StyleTheme(darkTheme = isDarkMode) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     if (!isLoggedIn) {
                         if (!showRegistration) {
@@ -78,6 +83,8 @@ class MainActivity : ComponentActivity() {
                             "preferences" -> PreferencesScreen(
                                 preferencesViewModel = preferencesViewModel,
                                 userViewModel = userViewModel,
+                                wardrobeViewModel = wardrobeViewModel,
+                                favoritesViewModel = favoritesViewModel,
                                 onNavigateToHome = { currentScreen = "home" },
                                 onNavigateToWardrobe = { currentScreen = "wardrobe" },
                                 onNavigateToAdd = { currentScreen = "add" },
@@ -104,6 +111,7 @@ class MainActivity : ComponentActivity() {
                             )
                             else -> HomeScreen(
                                 outfitRecommendationViewModel = outfitRecommendationViewModel,
+                                favoritesViewModel = favoritesViewModel,
                                 onNavigateToAdd = { currentScreen = "add" },
                                 onNavigateToFavorites = { currentScreen = "favorites" },
                                 onNavigateToSearch = { currentScreen = "wardrobe" },

@@ -16,14 +16,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -54,10 +55,6 @@ import androidx.compose.ui.unit.dp
 import com.example.aura_style.data.local.entity.WardrobeItem
 import com.example.aura_style.ui.viewmodel.WardrobeViewModel
 
-private val PurpleAccent = Color(0xFF7E57C2)
-private val LightPurple = Color(0xFFF3E5F5)
-private val SearchFieldBackground = Color(0xFFF8F5FC)
-
 private val CategoryFilters = listOf("All", "Tops", "Bottoms", "Shoes")
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,10 +68,8 @@ fun WardrobeScreen(
     onNavigateToFavorites: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {}
 ) {
-    Log.d("WardrobeScreen", "WardrobeScreen composable called")
     var selectedNavIndex by remember { mutableIntStateOf(1) }
 
-    // Use produceState to safely collect flows and provide fallbacks on error.
     val searchQuery by produceState(initialValue = "", key1 = wardrobeViewModel) {
         try {
             wardrobeViewModel.searchQuery.collect { value = it }
@@ -91,7 +86,7 @@ fun WardrobeScreen(
         }
     }
 
-    val items by produceState(initialValue = emptyList<com.example.aura_style.data.local.entity.WardrobeItem>(), key1 = wardrobeViewModel) {
+    val items by produceState(initialValue = emptyList<WardrobeItem>(), key1 = wardrobeViewModel) {
         try {
             wardrobeViewModel.filteredItems.collect { value = it }
         } catch (_: Throwable) {
@@ -101,7 +96,7 @@ fun WardrobeScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -110,25 +105,25 @@ fun WardrobeScreen(
                             text = "Wardrobe",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF212121)
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
                             text = "${items.size} items",
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFF616161)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = Color(0xFF212121)
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
         },
         bottomBar = {
             NavigationBar(
                 modifier = Modifier.fillMaxWidth(),
-                containerColor = Color.White,
+                containerColor = MaterialTheme.colorScheme.surface,
                 tonalElevation = 8.dp
             ) {
                 NavigationBarItem(
@@ -212,10 +207,10 @@ fun WardrobeScreen(
                         onClick = { wardrobeViewModel.updateCategoryFilter(category) },
                         label = { Text(category) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = PurpleAccent,
-                            selectedLabelColor = Color.White,
-                            containerColor = SearchFieldBackground,
-                            labelColor = Color(0xFF212121)
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                 }
@@ -249,7 +244,7 @@ private fun WardrobeItemCard(item: WardrobeItem) {
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = LightPurple,
+        color = MaterialTheme.colorScheme.secondaryContainer,
         shape = RoundedCornerShape(18.dp)
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
@@ -257,6 +252,7 @@ private fun WardrobeItemCard(item: WardrobeItem) {
                 modifier = Modifier
                     .size(48.dp)
                     .background(swatchColor, CircleShape)
+                    .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -264,7 +260,7 @@ private fun WardrobeItemCard(item: WardrobeItem) {
             Text(
                 text = item.name,
                 style = MaterialTheme.typography.titleMedium,
-                color = Color(0xFF212121),
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -275,14 +271,14 @@ private fun WardrobeItemCard(item: WardrobeItem) {
             Text(
                 text = item.color,
                 style = MaterialTheme.typography.bodyMedium,
-                color = PurpleAccent,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Medium
             )
 
             Text(
                 text = item.category,
                 style = MaterialTheme.typography.bodySmall,
-                color = Color(0xFF616161),
+                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
                 modifier = Modifier.padding(top = 4.dp)
             )
         }
@@ -299,13 +295,13 @@ private fun EmptyWardrobeState() {
         Text(
             text = "No items found",
             style = MaterialTheme.typography.titleMedium,
-            color = Color(0xFF212121),
+            color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.SemiBold
         )
         Text(
             text = "Try a different search or clear your filters.",
             style = MaterialTheme.typography.bodySmall,
-            color = Color(0xFF616161),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 6.dp)
         )
     }
@@ -321,12 +317,6 @@ private fun colorForName(colorName: String): Color {
         "red" -> Color(0xFFF44336)
         "white" -> Color(0xFFF5F5F5)
         "black" -> Color(0xFF212121)
-        else -> PurpleAccent
+        else -> Color(0xFF7E57C2) // Default representational color
     }
 }
-
-
-
-
-
-
